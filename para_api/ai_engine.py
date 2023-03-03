@@ -4,26 +4,26 @@ import string
 
 import openai
 from dotenv import load_dotenv
-from sqlalchemy_repo import AreaRepository, ProjectRepository
+from sqlalchemy_repo import AreaRepository, ProjectRepository, ResourceRepository
 
 
 class PromptEngine:
-    def __init__(self, db_session, model_engine="text-davinci-003"):
+    def __init__(self, area_repo, project_repo, resource_repo, model_engine="text-davinci-003"):
         load_dotenv()
         openai.api_key = os.getenv("OPENAI_TOKEN")
         self.model_engine = model_engine
-        self.db_session = db_session
+        self.area_repo = area_repo
+        self.project_repo = project_repo
+        self.resource_repo = resource_repo
 
-    def categorize_tasks(self, tasks):
+    def categorize_tasks(self, tasks) -> str:
         with open("prompts/categorize_para.txt", "r") as text_prompt:
-            area_repo = AreaRepository(self.db_session)
-            project_repo = ProjectRepository(self.db_session)
-            areas = area_repo.get_all()
+            areas = self.area_repo.get_all()
             curr_state = {}
             for area in areas:
                 curr_state[area.title] = {}
                 for project_id in area.projects:
-                    project = project_repo.get_by_id(project_id)
+                    project = self.project_repo.get_by_id(project_id)
                     curr_state[area.title][project.title] = []
 
             json_text = json.dumps(curr_state)

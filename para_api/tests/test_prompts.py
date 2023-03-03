@@ -2,7 +2,11 @@ import json
 
 from ai_engine import PromptEngine
 from models import Area, Project
-from sqlalchemy_repo import AreaRepository, ProjectRepository, ResourceRepository
+from sqlalchemy_repo import (
+    AreaRepository,
+    ProjectRepository,
+    ResourceRepository,
+)
 
 
 class TestPrompt:
@@ -30,7 +34,11 @@ class TestPrompt:
 * Plan out meals for the week
 * Look into macros for meal planning"""
 
-        ai = PromptEngine(db)
+        ai = PromptEngine(
+            area_repo=area_repo,
+            project_repo=project_repo,
+            resource_repo=ResourceRepository(db),
+        )
         output = json.loads(ai.categorize_tasks(tasks))
 
         assert "Research mechanic" in output["Vehicle"]["Oil Change"]

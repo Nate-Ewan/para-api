@@ -1,8 +1,4 @@
-import db_tables as tables
 import models
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-from sqlalchemy_utils import UUIDType
 
 areas = [
     models.Area(title="Cooking", projects=[], resources=[], id=0),
@@ -134,3 +130,5 @@ class ResourceRepository:
             if self.resources[index].id == id:
                 to_remove = index
                 break
+
+        del self.areas[to_remove]
