@@ -1,21 +1,21 @@
-import models
 import db_tables as tables
+import models
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy_utils import UUIDType
 
 areas = [
-    models.Area(title = "Cooking", projects = [], resources = [],id = 0),
-    models.Area(title = "Vehicle", projects = [], id = 1),
-    models.Area(title = "Skiing", projects = [], id = 2),
+    models.Area(title="Cooking", projects=[], resources=[], id=0),
+    models.Area(title="Vehicle", projects=[], id=1),
+    models.Area(title="Skiing", projects=[], id=2),
 ]
 
 projects = [
-    models.Project(title = "Mexican Food", area = areas[0], id = 0),
-    models.Project(title = "Car tune up", area = areas[1], id = 1),
-    models.Project(title = "Burning Man Prep for Car", area = areas[1], id = 2),
-    models.Project(title = "Explore Alta skiing", area = areas[2], id = 3),
-    models.Project(title = "Learn to carve", area = areas[2], id = 4),
+    models.Project(title="Mexican Food", area=areas[0], id=0),
+    models.Project(title="Car tune up", area=areas[1], id=1),
+    models.Project(title="Burning Man Prep for Car", area=areas[1], id=2),
+    models.Project(title="Explore Alta skiing", area=areas[2], id=3),
+    models.Project(title="Learn to carve", area=areas[2], id=4),
 ]
 
 areas[0].projects = [projects[0]]
@@ -24,17 +24,17 @@ areas[2].projects = [projects[3], projects[4]]
 
 resources = [
     models.Resource(
-        title = "Cauliflower Barbacoa", 
-        projects = [projects[0]], 
-        text = "Here's a great cauliflower barbacoa recipe...",
-        id = 0
+        title="Cauliflower Barbacoa",
+        projects=[projects[0]],
+        text="Here's a great cauliflower barbacoa recipe...",
+        id=0,
     ),
     models.Resource(
-        title = "Auto Shop",
-        projects = [projects[1], projects[2]],
-        areas = [areas[1]],
-        text = "Here's the link to the prefered auto shop...",
-        id = 1
+        title="Auto Shop",
+        projects=[projects[1], projects[2]],
+        areas=[areas[1]],
+        text="Here's the link to the prefered auto shop...",
+        id=1,
     ),
 ]
 
@@ -72,8 +72,9 @@ class ProjectRepository:
             if self.projects[index].id == id:
                 to_remove = index
                 break
-            
+
         del self.projects[to_remove]
+
 
 class AreaRepository:
     def __init__(self):
@@ -105,6 +106,7 @@ class AreaRepository:
 
         del self.areas[to_remove]
 
+
 class ResourceRepository:
     def __init__(self):
         self.resources = resources
@@ -132,4 +134,3 @@ class ResourceRepository:
             if self.resources[index].id == id:
                 to_remove = index
                 break
-           

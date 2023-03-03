@@ -1,9 +1,7 @@
 from typing import List, Optional
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Table, Enum
-from sqlalchemy.orm import declarative_base, relationship, Mapped, mapped_column
-
-
+from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Table
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
 
 Base = declarative_base()
 
@@ -22,18 +20,19 @@ area_resource = Table(
     Column("area_id", ForeignKey("areas.id"), primary_key=True),
 )
 
+
 class Resource(Base):
     __tablename__ = "resources"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String(50))
     text = Column(String(25535))
-    
+
     areas: Mapped[List["Area"]] = relationship(
-        secondary = area_resource, back_populates="resources"
+        secondary=area_resource, back_populates="resources"
     )
     projects: Mapped[List["Project"]] = relationship(
-        secondary = project_resource, back_populates="resources"
+        secondary=project_resource, back_populates="resources"
     )
 
     def __eq__(self, other):
@@ -43,6 +42,7 @@ class Resource(Base):
 
     def __repr__(self):
         return f"<Resource(title='{self.title}', id='{self.id}')>"
+
 
 class Project(Base):
     __tablename__ = "projects"
@@ -54,11 +54,10 @@ class Project(Base):
 
     area_id: Mapped[Optional[int]] = mapped_column(ForeignKey("areas.id"))
     area: Mapped[Optional["Area"]] = relationship("Area", back_populates="projects")
-    
+
     # resource_ids = Mapped[Optional[List[int]]] = mapped_column(ForeignKey("project_resource.resource_id"))
     resources: Mapped[Optional[List[Resource]]] = relationship(
-        secondary=project_resource,
-        back_populates="projects"
+        secondary=project_resource, back_populates="projects"
     )
 
     def __repr__(self):
@@ -68,7 +67,8 @@ class Project(Base):
         if self.id == other.id and self.title == other.title:
             return True
         return False
-    
+
+
 class Area(Base):
     __tablename__ = "areas"
 
@@ -76,12 +76,12 @@ class Area(Base):
     title = Column(String(50))
 
     projects: Mapped[List[Project]] = relationship("Project", back_populates="area")
-    
+
     resources: Mapped[List[Resource]] = relationship(
         secondary=area_resource,
         back_populates="areas",
     )
-    
+
     def __eq__(self, other):
         if self.id == other.id and self.title == other.title:
             return True
