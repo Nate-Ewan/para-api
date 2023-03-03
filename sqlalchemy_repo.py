@@ -30,7 +30,7 @@ class ProjectRepository:
                 id = project.id,
                 title = project.title,
                 area = project.area_id,
-                resources = [],
+                resources = [resource.id for resource in project.resources],
             )
 
     def create(self, project: models.Project) -> str:
@@ -42,6 +42,16 @@ class ProjectRepository:
             title=project.title,
             area=area,
         )
+        
+        if project.resources:
+            db_project.resources.extend(
+                self.session.scalars( 
+                    select(tables.Resource)
+                    .where(tables.Resource.id.in_(project.resources))
+                ).all()
+            )
+            
+        
         self.session.add(db_project)
         self.session.commit()
         return db_project.id
@@ -51,12 +61,22 @@ class ProjectRepository:
             select(tables.Project)
             .where(tables.Project.id == project.id)
         ).one()
-        db_area = self.session.scalars(
-            select(tables.Area)
-            .where(tables.Area.id == project.area)
-        ).one()
+        
         db_project.title = project.title
-        db_project.area = db_area
+
+        if project.area:
+            db_area = self.session.scalars(
+                select(tables.Area)
+                .where(tables.Area.id == project.area)
+            ).one()
+            db_project.area = db_area
+            
+        if project.resources:
+            db_project.resources = self.session.scalars( 
+                    select(tables.Resource)
+                    .where(tables.Resource.id.in_(project.resources))
+                ).all()
+
         self.session.commit()
 
     def delete(self, id):
@@ -100,19 +120,21 @@ class AreaRepository:
         db_area = tables.Area(
             title=area.title
         )
-        projects = [
-            self.session.scalar(
-                select(tables.Project)
-                .where(tables.Project.id == project_id)
-            ) for project_id in area.projects
-        ]
-        resources = [
-            self.session.scalar(
-                select(tables.Resource)
-                .where(tables.Resource.id == resource_id)
-            ) for resource_id in area.resources
-        ]
-        db_area.projects = projects
+        if area.projects:
+            projects = [
+                self.session.scalar(
+                    select(tables.Project)
+                    .where(tables.Project.id == project_id)
+                ) for project_id in area.projects
+            ]
+            db_area.projects = projects
+        if area.resources:
+            resources = [
+                self.session.scalar(
+                    select(tables.Resource)
+                    .where(tables.Resource.id == resource_id)
+                ) for resource_id in area.resources
+            ]
         self.session.add(db_area)
         self.session.commit()
         return db_area.id
@@ -171,20 +193,20 @@ class ResourceRepository:
             title = resource.title,
             text = resource.text,
         )
-        projects = [
-            self.session.scalar(
-                select(tables.Project)
-                .where(tables.Project.id == project_id)
-            ) for project_id in resource.projects
-        ]
-        areas = [
-            self.session.scalar(
-                select(tables.Area)
-                .where(tables.Area.id == area_id)
-            ) for area_id in resource.areas
-        ]
-        db_resource.projects = projects
-        db_resource.areas = areas
+        if resource.projects:
+            db_resource.projects = [
+                self.session.scalar(
+                    select(tables.Project)
+                    .where(tables.Project.id == project_id)
+                ) for project_id in resource.projects
+            ]
+        if resource.areas:
+            db_resource.areas = [
+                self.session.scalar(
+                    select(tables.Area)
+                    .where(tables.Area.id == area_id)
+                ) for area_id in resource.areas
+            ]
         self.session.add(db_resource)
         self.session.commit()
         return db_resource.id
@@ -194,9 +216,29 @@ class ResourceRepository:
             select(tables.Resource)
             .where(tables.Resource.id == resource.id)
         )
+
+        if resource.projects:
+            db_resource.projects = [
+                self.session.scalar(
+                    select(tables.Project)
+                    .where(tables.Project.id == project_id)
+                ) for project_id in resource.projects
+            ]
+        else:
+            db_resource.projects = []
+
+        if resource.areas:
+            db_resource.areas = [
+                self.session.scalar(
+                    select(tables.Area)
+                    .where(tables.Area.id == area_id)
+                ) for area_id in resource.areas
+            ]
+        else:
+            db_resource.areas = []
+
         db_resource.title = resource.title
         db_resource.text = resource.text
-        # TODO: Append/remove updated areas and projects
         self.session.commit()
 
     def delete(self, id):

@@ -49,6 +49,30 @@ class TestProjectRepo:
         assert updated_db_project.title == project.title
         
 
+    def test_add_project_to_area(self, project_repo, db, area):
+        project = models.Project("New Project", area = 0, resources = [0])
+        project.id = project_repo.create(project)
+        
+        project.area = area.id
+
+        project_repo.update(project)
+
+        db_project = db.scalar(
+            select(db_tables.Project)
+            .where(db_tables.Project.id == project.id)
+        )
+        
+        assert db_project.area.id == area.id
+        
+
+    def test_add_resource_to_project(self, project_repo, db, resource):
+        project = models.Project("New Project", area = 0, resources = [0])
+        project.id = project_repo.create(project)
+        project.resources.append(resource.id)
+        project_repo.update(project)
+        project = project_repo.get_by_id(project.id)
+        assert resource.id in project.resources
+
     def test_delete(self, project_repo, db):
         project = project_repo.get_by_id(0)
         
@@ -167,5 +191,30 @@ class TestResourceRepo:
         resource_repo.delete(0)
         resources = resource_repo.get_all()
 
-        
         assert resources == []
+        
+    def test_add_and_remove_resource_with_project(self, resource_repo, resource, project):
+        resource.projects = [project.id]
+        resource_repo.update(resource)
+        resource = resource_repo.get_by_id(resource.id)
+
+        assert project.id in resource.projects
+        
+        resource.projects = []
+        resource_repo.update(resource)
+        resource = resource_repo.get_by_id(resource.id)
+        
+        assert resource.projects == []
+    
+    def test_add_and_remove_resource_with_area(self, resource_repo, resource, area):
+        resource.areas = [area.id]
+        resource_repo.update(resource)
+        resource = resource_repo.get_by_id(resource.id)
+        
+        assert area.id in resource.areas
+        
+        resource.areas = []
+        resource_repo.update(resource)
+        resource = resource_repo.get_by_id(resource.id)
+
+        assert resource.areas == []

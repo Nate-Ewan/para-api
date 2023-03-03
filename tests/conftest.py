@@ -2,6 +2,14 @@ import pytest
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
 import db_tables
+import models
+import openai
+from dotenv import load_dotenv
+import os
+from faker import Faker
+
+fake = Faker()
+load_dotenv()
 
 @pytest.fixture
 def in_memory_db():
@@ -47,3 +55,29 @@ def db_project(db):
         .where(db_tables.Project.title == "project0")
     ).one()
     
+@pytest.fixture
+def area(db):
+    area = db_tables.Area(title = fake.word())
+    db.add(area)
+    db.commit()
+    return models.Area(title = area.title, id = area.id)
+
+@pytest.fixture
+def resource(db):
+    resource = db_tables.Resource(title = fake.word(), text = fake.sentence())
+    db.add(resource)
+    db.commit()
+    return models.Resource(title = resource.title, text = resource.text, id = resource.id)
+
+@pytest.fixture
+def project(db):
+    project = db_tables.Project(title = fake.word())
+    db.add(project)
+    db.commit()
+    return models.Project(title = project.title, id = project.id)
+
+@pytest.fixture
+def ai():
+    openai.api_key = os.getenv("OPENAI_TOKEN")
+    model_engine = "text-davinci-003"
+    yield openai.Completion

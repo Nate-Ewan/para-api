@@ -1,0 +1,9 @@
+fastapi
+pydantic
+sqlalchemy
+sqlalchemy-utils
+pytest
+notion-client
+openai
+faker
+python-dotenv

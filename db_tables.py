@@ -55,7 +55,8 @@ class Project(Base):
     area_id: Mapped[Optional[int]] = mapped_column(ForeignKey("areas.id"))
     area: Mapped[Optional["Area"]] = relationship("Area", back_populates="projects")
     
-    resources: Mapped[List[Resource]] = relationship(
+    # resource_ids = Mapped[Optional[List[int]]] = mapped_column(ForeignKey("project_resource.resource_id"))
+    resources: Mapped[Optional[List[Resource]]] = relationship(
         secondary=project_resource,
         back_populates="projects"
     )
