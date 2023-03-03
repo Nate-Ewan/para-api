@@ -2,20 +2,17 @@ We have three levels of categorization; Areas, Projects, and Tasks. Areas are br
 
 Given the following bullet points, organize them into areas, projects, and tasks. The output should be in a JSON format:
 {
-    "area": "Coding", 
-    "project": "chatbot", 
-    "task": "write interface"
+    "area 1": {
+        "project 1": [
+            "task 1",
+            "task 2"
+        ],
+        "project 2": []
+    }
 }
 
 These are the current areas and projects that exist:
-{
-    "area": "${area0}",
-    "project": "${project0}"
-},
-{
-    "area": "${area1}",
-    "project": "${project1}",
-},
+${curr_state}
 
 If a task does not fit into the current areas and projects, create a new area or project. Here is the input:
 ${tasks}
