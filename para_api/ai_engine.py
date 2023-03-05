@@ -8,25 +8,16 @@ from sqlalchemy_repo import AreaRepository, ProjectRepository, ResourceRepositor
 
 
 class PromptEngine:
-    def __init__(self, area_repo, project_repo, resource_repo, model_engine="text-davinci-003"):
+    def __init__(self, sa_repo, model_engine="text-davinci-003"):
         load_dotenv()
         openai.api_key = os.getenv("OPENAI_TOKEN")
         self.model_engine = model_engine
-        self.area_repo = area_repo
-        self.project_repo = project_repo
-        self.resource_repo = resource_repo
+        self.sa_repo = sa_repo
 
     def categorize_tasks(self, tasks) -> str:
         with open("prompts/categorize_para.txt", "r") as text_prompt:
-            areas = self.area_repo.get_all()
-            curr_state = {}
-            for area in areas:
-                curr_state[area.title] = {}
-                for project_id in area.projects:
-                    project = self.project_repo.get_by_id(project_id)
-                    curr_state[area.title][project.title] = []
-
-            json_text = json.dumps(curr_state)
+            areas = self.sa_repo.get_all_areas()
+            json_text = json.dumps([area.toDict() for area in areas])
 
             prompt = string.Template(template=text_prompt.read())
             prompt = prompt.substitute(tasks=tasks, curr_state=json_text)

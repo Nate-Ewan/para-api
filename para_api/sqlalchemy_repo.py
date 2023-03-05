@@ -12,58 +12,51 @@ class SQLAlchemyRepository:
     def area_db_to_model(
         self,
         area: tables.Area,
-        projects: List[models.Project] = None,
-        resources: List[models.Resource] = None,
     ) -> models.Area:
         model_area = models.Area(
             title=area.title,
             id=area.id,
         )
-        if projects:
-            model_area.projects = projects
-        elif area.projects:
+        if area.projects:
             model_area.projects = [
                 self.project_db_to_model(project) for project in area.projects
             ]
 
-        if resources:
-            model_area.resources = resources
-        elif area.resources:
+            for project in model_area.projects:
+                project.area = model_area
+
+        if area.resources:
             model_area.resources = [
                 self.resource_db_to_model(resource) for resource in area.resources
             ]
+
+            for resource in model_area.resources:
+                resource.areas.append(model_area)
 
         return model_area
 
     def project_db_to_model(
         self,
         project: tables.Project,
-        area: models.Area = None,
-        resources: List[models.Resource] = None,
     ) -> models.Project:
         model_project = models.Project(
             id=project.id,
             title=project.title,
         )
-        if area:
-            model_project.area = area
-        elif project.area:
-            model_project.area = self.area_db_to_model(project.area)
 
-        if resources:
-            model_project.resources = resources
-        elif project.resources:
-            model_project = [
+        if project.resources:
+            model_project.resources = [
                 self.resource_db_to_model(resource) for resource in project.resources
             ]
+            
+            for resource in model_project.resources:
+                resource.projects.append(model_project)
 
         return model_project
 
     def resource_db_to_model(
         self,
         resource: tables.Resource,
-        areas: List[models.Area] = None,
-        projects: List[models.Project] = None,
     ):
         model_resource = models.Resource(
             title=resource.title,
@@ -71,24 +64,10 @@ class SQLAlchemyRepository:
             text=resource.text,
         )
 
-        if areas:
-            model_resource.areas = areas
-        elif resource.areas:
-            model_resource.areas = [
-                self.area_db_to_model(area) for area in resource.areas
-            ]
-
-        if projects:
-            model_resource.projects = projects
-        elif resource.projects:
-            model_resource = [
-                self.project_db_to_model(project) for project in resource.projects
-            ]
-
         return model_resource
 
     def get_all_areas(self) -> List[models.Area]:
-        areas = self.session.scalars(select(tables.Area))
+        areas = self.db.scalars(select(tables.Area))
         return [
             self.area_db_to_model(area) for area in areas
         ]

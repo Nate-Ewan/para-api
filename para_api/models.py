@@ -11,8 +11,8 @@ class Area:
     ):
         self.id = id
         self.title = title
-        self.projects = projects or None
-        self.resources = resources or None
+        self.projects = projects or []
+        self.resources = resources or []
 
     def toDict(self):
         area = {
@@ -79,8 +79,8 @@ class Resource:
         self,
         title: str,
         text: str,
-        areas: List[str] = None,
-        projects: List[str] = None,
+        areas: List[str] = [],
+        projects: List[str] = [],
         id: Optional[str] = "",
     ):
         self.id = id

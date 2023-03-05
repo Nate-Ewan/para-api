@@ -208,3 +208,17 @@ class TestResourceRepo:
         resource = resource_repo.get_by_id(resource.id)
 
         assert resource.areas == []
+
+
+class TestSQLAlchemyRepo:
+    @pytest.fixture
+    def sa_repo(self, db):
+        return repos.SQLAlchemyRepository(db)
+
+    def test_get_all_areas_linked(self, sa_repo):
+        areas = sa_repo.get_all_areas()
+        area0 = areas[0]
+
+        assert area0.title == "area0"
+        assert area0.projects[0].title == "project0"
+        assert area0.projects[0].area == area0

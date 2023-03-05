@@ -6,6 +6,7 @@ from sqlalchemy_repo import (
     AreaRepository,
     ProjectRepository,
     ResourceRepository,
+    SQLAlchemyRepository,
 )
 
 
@@ -35,9 +36,7 @@ class TestPrompt:
 * Look into macros for meal planning"""
 
         ai = PromptEngine(
-            area_repo=area_repo,
-            project_repo=project_repo,
-            resource_repo=ResourceRepository(db),
+            sa_repo=SQLAlchemyRepository(db)
         )
         output = json.loads(ai.categorize_tasks(tasks))
 
