@@ -8,7 +8,7 @@ from sqlalchemy_repo import AreaRepository, ProjectRepository, ResourceRepositor
 
 
 class PromptEngine:
-    def __init__(self, sa_repo, model_engine="text-davinci-003"):
+    def __init__(self, sa_repo, model_engine="gpt-3.5-turbo"):
         load_dotenv()
         openai.api_key = os.getenv("OPENAI_TOKEN")
         self.model_engine = model_engine
