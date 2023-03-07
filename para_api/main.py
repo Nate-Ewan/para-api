@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from tmp_repo import AreaRepository, ProjectRepository, ResourceRepository
 from pydantic import BaseModel
 from ai_engine import PromptEngine
+from services import get_all
 
 class AddTask(BaseModel):
     text: str
@@ -12,11 +13,8 @@ app = FastAPI()
 
 @app.get("/all")
 async def root():
-    area_repo = AreaRepository()
-    areas = area_repo.get_all()
-    areas_dict = [area.toDict() for area in areas]
-
-    return {"message": areas_dict}
+    areas = get_all()
+    return {"message": areas}
 
 
 @app.get("/area/{area_id}")
