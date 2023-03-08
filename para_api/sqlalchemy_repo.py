@@ -22,8 +22,7 @@ class ProjectRepository:
 
     def get_by_id(self, id) -> models.Project:
         project = self.session.scalars(
-            select(tables.Project)
-            .where(tables.Project.id == id)
+            select(tables.Project).where(tables.Project.id == id)
         ).one()
         return models.Project(
             id=project.id,
@@ -34,8 +33,7 @@ class ProjectRepository:
 
     def create(self, project: models.Project) -> str:
         area = self.session.scalars(
-            select(tables.Area)
-            .where(tables.Area.id == project.area)
+            select(tables.Area).where(tables.Area.id == project.area)
         ).one()
         db_project = tables.Project(
             title=project.title,
@@ -45,8 +43,9 @@ class ProjectRepository:
         if project.resources:
             db_project.resources.extend(
                 self.session.scalars(
-                    select(tables.Resource)
-                    .where(tables.Resource.id.in_(project.resources))
+                    select(tables.Resource).where(
+                        tables.Resource.id.in_(project.resources)
+                    )
                 ).all()
             )
 
@@ -56,31 +55,27 @@ class ProjectRepository:
 
     def update(self, project: models.Project):
         db_project = self.session.scalars(
-            select(tables.Project)
-            .where(tables.Project.id == project.id)
+            select(tables.Project).where(tables.Project.id == project.id)
         ).one()
 
         db_project.title = project.title
 
         if project.area:
             db_area = self.session.scalars(
-                select(tables.Area)
-                .where(tables.Area.id == project.area)
+                select(tables.Area).where(tables.Area.id == project.area)
             ).one()
             db_project.area = db_area
 
         if project.resources:
             db_project.resources = self.session.scalars(
-                select(tables.Resource)
-                .where(tables.Resource.id.in_(project.resources))
+                select(tables.Resource).where(tables.Resource.id.in_(project.resources))
             ).all()
 
         self.session.commit()
 
     def delete(self, id):
         db_project = self.session.scalars(
-            select(tables.Project)
-            .where(tables.Project.id == id)
+            select(tables.Project).where(tables.Project.id == id)
         ).one()
         self.session.delete(db_project)
         self.session.commit()
@@ -103,8 +98,7 @@ class AreaRepository:
         ]
 
     def get_by_id(self, id):
-        area = self.session.scalar(select(tables.Area)
-        .where(tables.Area.id == id))
+        area = self.session.scalar(select(tables.Area).where(tables.Area.id == id))
         return models.Area(
             id=area.id,
             title=area.title,
@@ -117,8 +111,7 @@ class AreaRepository:
         if area.projects:
             projects = [
                 self.session.scalar(
-                    select(tables.Project)
-                    .where(tables.Project.id == project_id)
+                    select(tables.Project).where(tables.Project.id == project_id)
                 )
                 for project_id in area.projects
             ]
@@ -126,8 +119,7 @@ class AreaRepository:
         if area.resources:
             resources = [
                 self.session.scalar(
-                    select(tables.Resource)
-                    .where(tables.Resource.id == resource_id)
+                    select(tables.Resource).where(tables.Resource.id == resource_id)
                 )
                 for resource_id in area.resources
             ]
@@ -138,15 +130,13 @@ class AreaRepository:
 
     def update(self, area: models.Area):
         db_area = self.session.scalar(
-            select(tables.Area)
-            .where(tables.Area.id == area.id)
+            select(tables.Area).where(tables.Area.id == area.id)
         )
         db_area.title = area.title
         self.session.commit()
 
     def delete(self, id):
-        area = self.session.scalar(select(tables.Area)
-        .where(tables.Area.id == id))
+        area = self.session.scalar(select(tables.Area).where(tables.Area.id == id))
 
         self.session.delete(area)
         self.session.commit()
@@ -172,8 +162,7 @@ class ResourceRepository:
     def get_by_id(self, id):
         # TODO: If resource is None, throw an exception
         resource = self.session.scalar(
-            select(tables.Resource)
-            .where(tables.Resource.id == id)
+            select(tables.Resource).where(tables.Resource.id == id)
         )
         return models.Resource(
             id=resource.id,
@@ -191,16 +180,14 @@ class ResourceRepository:
         if resource.projects:
             db_resource.projects = [
                 self.session.scalar(
-                    select(tables.Project)
-                    .where(tables.Project.id == project_id)
+                    select(tables.Project).where(tables.Project.id == project_id)
                 )
                 for project_id in resource.projects
             ]
         if resource.areas:
             db_resource.areas = [
                 self.session.scalar(
-                    select(tables.Area)
-                    .where(tables.Area.id == area_id)
+                    select(tables.Area).where(tables.Area.id == area_id)
                 )
                 for area_id in resource.areas
             ]
@@ -210,15 +197,13 @@ class ResourceRepository:
 
     def update(self, resource: models.Resource):
         db_resource = self.session.scalar(
-            select(tables.Resource)
-            .where(tables.Resource.id == resource.id)
+            select(tables.Resource).where(tables.Resource.id == resource.id)
         )
 
         if resource.projects:
             db_resource.projects = [
                 self.session.scalar(
-                    select(tables.Project)
-                    .where(tables.Project.id == project_id)
+                    select(tables.Project).where(tables.Project.id == project_id)
                 )
                 for project_id in resource.projects
             ]
@@ -228,8 +213,7 @@ class ResourceRepository:
         if resource.areas:
             db_resource.areas = [
                 self.session.scalar(
-                    select(tables.Area)
-                    .where(tables.Area.id == area_id)
+                    select(tables.Area).where(tables.Area.id == area_id)
                 )
                 for area_id in resource.areas
             ]
@@ -242,8 +226,7 @@ class ResourceRepository:
 
     def delete(self, id):
         resource = self.session.scalar(
-            select(tables.Resource)
-            .where(tables.Resource.id == id)
+            select(tables.Resource).where(tables.Resource.id == id)
         )
 
         self.session.delete(resource)
