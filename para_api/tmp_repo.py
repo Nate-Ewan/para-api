@@ -1,4 +1,5 @@
 import models
+from typing import List
 
 areas = [
     models.Area(title="Cooking", projects=[], resources=[], id=0),
@@ -39,6 +40,16 @@ areas[0].projects[0].resources = [resources[0]]
 areas[1].resources = [resources[1]]
 projects[1].resources = [resources[1]]
 projects[2].resources = [resources[1]]
+
+
+class SQLAlchemyRepo:
+    def __init__(self):
+        self.areas = areas
+        self.projects = projects
+        self.resources = resources
+
+    def get_all(self) -> List[models.Area]:
+        return self.areas
 
 
 class ProjectRepository:
