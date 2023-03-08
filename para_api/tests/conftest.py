@@ -30,7 +30,7 @@ def db(session):
     area = db_tables.Area(id=0, title="area0")
     project = db_tables.Project(id=0, title="project0", area=area)
     resource = db_tables.Resource(id=0, title="resource0", text="Text for resource 0")
-
+    
     session.add(area)
     session.add(project)
     session.add(resource)

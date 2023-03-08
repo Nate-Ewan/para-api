@@ -11,8 +11,8 @@ class Area:
     ):
         self.id = id
         self.title = title
-        self.projects = projects or None
-        self.resources = resources or None
+        self.projects = projects or []
+        self.resources = resources or []
 
     def toDict(self):
         area = {
@@ -30,6 +30,9 @@ class Area:
                 area["resources"].append(resource.toDict())
 
         return area
+    
+    def __repr__(self,):
+        return f"<Area: {self.title}, id: {self.id}>"
 
 
 class Project:
@@ -37,13 +40,16 @@ class Project:
         self,
         title: str,
         area: int = None,
-        resources: List[int] = [],
+        resources: List[int] = None,
         id: Optional[str] = "",
     ):
         self.id = id
         self.title = title
         self.area = area
-        self.resources = resources
+        self.resources = resources or []
+
+    def __repr__(self,):
+        return f"<Project: {self.title}, id: {self.id}>"
 
     def toDict(self):
         project = {
@@ -86,8 +92,11 @@ class Resource:
         self.id = id
         self.title = title
         self.text = text
-        self.areas = areas
-        self.projects = projects
+        self.areas = areas or []
+        self.projects = projects or []
+
+    def __repr__(self,):
+        return f"<Resource: {self.title}, id: {self.id}>"
 
     def toDict(self):
         resource = {

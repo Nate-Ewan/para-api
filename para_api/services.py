@@ -13,12 +13,12 @@ def get_all(db: Session) -> List[Area]:
     db_areas = db.scalars(select(tables.Area))
     for db_area in db_areas:
         area = Area(title=db_area.title, id=db_area.id)
-        areas.append(area)
 
         for db_project in db_area.projects:
             project = Project(title=db_project.title, area=area, id=db_project.id)
             area.projects.append(project)
-            projects.append(project)
+
+        areas.append(area)
 
     db_resources = db.scalars(select(tables.Resource))
     for db_resource in db_resources:
