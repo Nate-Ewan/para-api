@@ -20,14 +20,16 @@ class SQLAlchemyRepo:
             area = Area(title=db_area.title, id=db_area.id)
 
             for db_project in db_area.projects:
-                project = Project(title=db_project.title, area=area, id=db_project.id)
+                project = models.Project(
+                    title=db_project.title, area=area, id=db_project.id
+                )
                 area.projects.append(project)
 
             areas.append(area)
 
         db_resources = self.db.scalars(select(tables.Resource))
         for db_resource in db_resources:
-            resource = Resource(
+            resource = models.Resource(
                 title=db_resource.title, text=db_resource.text, id=db_resource.id
             )
             for ra in db_resource.areas:
@@ -45,6 +47,50 @@ class SQLAlchemyRepo:
             resources.append(resource)
 
         return areas
+
+    def create_area(self, area: models.Area):
+        db_area = tables.Area(title=area.title)
+        if area.projects:
+            projects = [
+                self.db.scalar(
+                    select(tables.Project).where(tables.Project.id == project.id)
+                )
+                for project in area.projects
+            ]
+            db_area.projects = projects
+        if area.resources:
+            resources = [
+                self.db.scalar(
+                    select(tables.Resource).where(tables.Resource.id == resource.id)
+                )
+                for resource in area.resources
+            ]
+            db_area.resources = resources
+        self.db.add(db_area)
+        self.db.commit()
+        return db_area.id
+
+    def create_project(self, project: models.Project):
+        area = self.db.scalars(
+            select(tables.Area).where(tables.Area.id == project.area.id)
+        ).one()
+        db_project = tables.Project(
+            title=project.title,
+            area=area,
+        )
+
+        if project.resources:
+            db_project.resources.extend(
+                self.db.scalars(
+                    select(tables.Resource).where(
+                        tables.Resource.id.in_(project.resources)
+                    )
+                ).all()
+            )
+
+        self.db.add(db_project)
+        self.db.commit()
+        return db_project.id
 
 
 class ProjectRepository:

@@ -2,11 +2,7 @@ import json
 
 from ai_engine import PromptEngine
 from models import Area, Project
-from sqlalchemy_repo import (
-    AreaRepository,
-    ProjectRepository,
-    ResourceRepository,
-)
+from sqlalchemy_repo import SQLAlchemyRepo
 
 
 class TestPrompt:
@@ -17,16 +13,15 @@ class TestPrompt:
         cooking_area = Area(title="Cooking")
         cooking_project = Area(title="Weekly Meal Prep")
 
-        area_repo = AreaRepository(db)
-        project_repo = ProjectRepository(db)
+        repo = SQLAlchemyRepo(db)
 
-        vehicle_area.id = area_repo.create(vehicle_area)
-        vehicle_project.area = vehicle_area.id
-        vehicle_project.id = project_repo.create(vehicle_project)
+        vehicle_area.id = repo.create_area(vehicle_area)
+        vehicle_project.area = vehicle_area
+        vehicle_project.id = repo.create_project(vehicle_project)
 
-        cooking_area.id = area_repo.create(cooking_area)
-        cooking_project.area = cooking_area.id
-        cooking_project.id = project_repo.create(cooking_project)
+        cooking_area.id = repo.create_area(cooking_area)
+        cooking_project.area = cooking_area
+        cooking_project.id = repo.create_project(cooking_project)
 
         tasks = """* Plan out dinner tonight, use up the tomato sauce
 * Research mechanic
@@ -34,11 +29,7 @@ class TestPrompt:
 * Plan out meals for the week
 * Look into macros for meal planning"""
 
-        ai = PromptEngine(
-            area_repo=area_repo,
-            project_repo=project_repo,
-            resource_repo=ResourceRepository(db),
-        )
+        ai = PromptEngine(repo)
         output = json.loads(ai.categorize_tasks(tasks))
 
         assert "Research mechanic" in output["Vehicle"]["Oil Change"]
