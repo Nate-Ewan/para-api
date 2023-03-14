@@ -1,7 +1,17 @@
 from typing import List, Optional
 
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Table
-from sqlalchemy.orm import Mapped, declarative_base, mapped_column, relationship
+from sqlalchemy import Column, ForeignKey, Integer, String, Table, create_engine
+from sqlalchemy.orm import (
+    Mapped,
+    declarative_base,
+    mapped_column,
+    relationship,
+    sessionmaker,
+)
+
+SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres@postgres:5432/postgres"
+engine = create_engine(SQLALCHEMY_DATABASE_URI)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
