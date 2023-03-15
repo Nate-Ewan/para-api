@@ -7,4 +7,4 @@ notion-client
 openai
 faker
 python-dotenv
-psycopg
+psycopg2
