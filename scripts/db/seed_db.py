@@ -1,7 +1,11 @@
 import db_tables as tables
+from sqlalchemy.orm import Session
+from sqlalchemy import engine
 
+# SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres@postgres:5432/postgres"
+# engine = create_engine(SQLALCHEMY_DATABASE_URI)
 
-def seed_db(db):
+def seed_db(db: Session):
     areas = [
         tables.Area(title="Cooking"),
         tables.Area(title="Vehicle"),
@@ -35,3 +39,4 @@ def seed_db(db):
         ),
     ]
     db.add_all(resources)
+    db.commit()

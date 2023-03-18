@@ -47,6 +47,22 @@ class SQLAlchemyRepo:
             resources.append(resource)
 
         return areas
+        
+    def get_area_by_id(self, area_id: int) -> models.Area:
+        db_area = self.db.scalar(select(tables.Area).where(tables.Area.id == area_id))
+        area = models.Area(title=db_area.title, id=db_area.id,)
+        for db_project in db_area.projects:
+            project = models.Project(title=db_project.title, area=area, id=db_project.id)
+            area.projects.append(project)
+            
+        for db_resource in db_area.resources:
+            resource = models.Resource(
+                title=db_resource.title, text=db_resource.text, id=db_resource.id,
+            )
+            area.resources.append(resource)
+            
+        # TODO: Connect resource areas and projects to created area and area.projects
+            
 
     def create_area(self, area: models.Area):
         db_area = tables.Area(title=area.title)

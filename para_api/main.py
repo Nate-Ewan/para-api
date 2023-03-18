@@ -31,8 +31,10 @@ async def get_all_areas(db: Session = Depends(get_db)):
 
 
 @app.get("/area/{area_id}")
-async def get_area(area_id: int):
-    return {"message": "Error"}
+async def get_area(area_id: int, db: Session = Depends(get_db)):
+    repo = sa_repo(db)
+    area = repo.get_area_by_id(area_id)
+    return {"Area": area.toDict()}
 
 
 @app.get("/task")
